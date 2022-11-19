@@ -10,13 +10,16 @@
 
 
 
+
+
 'STR#' 32000 "Add-on Name and Description" {
-		"Example AddOn"
+		"Specifikator"
 		"Example AddOn Description..."
 }
 
 'STR#' 32500 "Strings for the Menu" {
 		"Example AddOn Command... ^E3 ^ES ^EE ^EI ^ED ^ET ^10001"
+		"Test^E3^ES^EE^ED^EW^EL^T^32603"
 }
 
 'GDLG' 32600 Modal | grow   40   40  345  128  "Example Dialog" {
@@ -29,4 +32,14 @@
 1	""		Button_0
 2	""		Button_1
 3	""		Separator_0
+}
+
+'STR#' 32502 "Strings for the Menu" {
+	"Синхронизация свойств и параметров GDL"
+		"Test"
+}
+
+
+'STR#' 32501 "Add-On Strings" {
+		"Синхронизация свойств и параметров"
 }

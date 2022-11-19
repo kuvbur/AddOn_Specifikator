@@ -8,13 +8,8 @@
 #endif // AC_26
 #include "ResourceIds.hpp"
 #include "DGModule.hpp"
-
-static const GSResID AddOnInfoID			= ID_ADDON_INFO;
-	static const Int32 AddOnNameID			= 1;
-	static const Int32 AddOnDescriptionID	= 2;
-
-static const short AddOnMenuID				= ID_ADDON_MENU;
-	static const Int32 AddOnCommandID		= 1;
+#include "Specifikator.hpp"
+#include "DataReader.hpp"
 
 class ExampleDialog :	public DG::ModalDialog,
 						public DG::PanelObserver,
@@ -75,10 +70,16 @@ static GSErrCode MenuCommandHandler (const API_MenuParams *menuParams)
 	switch (menuParams->menuItemRef.menuResID) {
 		case AddOnMenuID:
 			switch (menuParams->menuItemRef.itemIndex) {
+				case MonAll_CommandID:
+				{
+					test();
+				}
+				break;
 				case AddOnCommandID:
 					{
-						ExampleDialog dialog;
-						dialog.Invoke ();
+						test();
+						//ExampleDialog dialog;
+						//dialog.Invoke ();
 					}
 					break;
 			}
@@ -97,7 +98,7 @@ API_AddonType __ACDLL_CALL CheckEnvironment (API_EnvirParams* envir)
 
 GSErrCode __ACDLL_CALL RegisterInterface (void)
 {
-	return ACAPI_Register_Menu (AddOnMenuID, 0, MenuCode_Tools, MenuFlag_Default);
+	return ACAPI_Register_Menu (AddOnMenuID, AddOnPromtID, MenuCode_Tools, MenuFlag_Default);
 }
 
 GSErrCode __ACENV_CALL Initialize (void)
