@@ -1,6 +1,8 @@
 #pragma once
 #if !defined (COMMON_HPP)
 #define	COMMON_HPP
+#include	"APIEnvir.h"
+#include	"ACAPinc.h"
 #ifdef AC_25
 #include	"APICommon25.h"
 #endif // AC_25

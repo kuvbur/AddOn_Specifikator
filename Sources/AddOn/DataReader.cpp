@@ -1,16 +1,13 @@
 //------------ kuvbur 2022 ------------
-#include "APIEnvir.h"
-#include "ACAPinc.h"
+#include "ResourceIds.hpp"
+#include "DataReader.hpp"
+#include "Common_func.hpp"
 #ifdef AC_25
 #include	"APICommon25.h"
 #endif // AC_25
 #ifdef AC_26
 #include	"APICommon26.h"
 #endif // AC_26
-#include "ResourceIds.hpp"
-#include "DataReader.hpp"
-#include "Common_func.hpp"
-
 void test() {
 	GS::Array<API_Guid> el;
 	el = GetSelectedElements(false, false);
@@ -25,7 +22,7 @@ void test() {
 
 		for (const auto& elemComponent : elemComponents) {
 			const GS::UniString componentGuid = APIGuid2GSGuid(elemComponent.componentID.componentGuid).ToUniString();
-			WriteReport("Properties of component with guid %s", componentGuid.ToCStr().Get());
+			WriteReport_Alert("Properties of component with guid %s", componentGuid.ToCStr().Get());
 
 			GS::Array<API_PropertyDefinition> propertyDefinitions;
 			if (ACAPI_ElemComponent_GetPropertyDefinitions(elemComponent, API_PropertyDefinitionFilter_All, propertyDefinitions) != NoError) {
@@ -48,7 +45,7 @@ void test() {
 
 				GS::UniString propertyValue;
 				ACAPI_Property_GetPropertyValueString(property, &propertyValue);
-				WriteReport("(%s) %s: %s", group.name.ToCStr().Get(), property.definition.name.ToCStr().Get(), propertyValue.ToCStr().Get());
+				WriteReport_Alert("(%s) %s: %s", group.name.ToCStr().Get(), property.definition.name.ToCStr().Get(), propertyValue.ToCStr().Get());
 			}
 		}
 	}

@@ -3,7 +3,8 @@
 
 #ifndef DATAREADER_HPP
 #define	DATAREADER_HPP
-
+#include	"APIEnvir.h"
+#include	"ACAPinc.h"
 #ifdef AC_25
 #include	"APICommon25.h"
 #endif // AC_25
