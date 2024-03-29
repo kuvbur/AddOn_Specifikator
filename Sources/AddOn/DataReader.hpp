@@ -17,6 +17,8 @@
 
 void test();
 
+void Get_Qty(API_Guid elemGuid);
+
 #endif
 
 

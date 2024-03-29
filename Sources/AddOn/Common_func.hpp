@@ -1,3 +1,4 @@
+//------------ kuvbur 2022 ------------
 #pragma once
 #if !defined (COMMON_HPP)
 #define	COMMON_HPP
@@ -11,8 +12,6 @@
 #endif // AC_26
 #include	"ResourceIds.hpp"
 
-GS::Array<API_Guid> GetSelectedElements(bool assertIfNoSel, bool onlyEditable);
+GS::Array<API_Guid> GetSelectedElements();
 
 #endif
-
-

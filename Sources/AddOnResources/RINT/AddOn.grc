@@ -6,28 +6,16 @@
 }
 
 'STR#' ID_ADDON_MENU "Strings for the Menu" {
-/* [  1] */		"Example AddOn Command... ^E3 ^ES ^EE ^EI ^ED ^ET ^10001"
-/* [  2] */		"Test^E3^ES^EE^ED^EW^EL^T^32603"
+/* [  1] */		"Test^E3^ES^EE^ED^EW^EL^T^32603"
 }
 
-'GDLG' ID_ADDON_DLG Modal | grow   40   40  345  128  "Example Dialog" {
-/* [  1] */ Button				  245   95   90   23	LargePlain  "OK"
-/* [  2] */ Button				  145   95   90   23	LargePlain  "Cancel"
-/* [  3] */ Separator			   10   83  325    2
-}
-
-'DLGH' ID_ADDON_DLG DLG_Example {
-1	""		Button_0
-2	""		Button_1
-3	""		Separator_0
-}
 
 'STR#' ID_ADDON_PROMT "Strings for the Menu" {
-/* [  ] */	"Синхронизация свойств и параметров GDL"
+/* [  ] */	"Specifikator"
 /* [  1] */		"Test"
 }
 
 
 'STR#' ID_ADDON_STRINGS "Add-On Strings" {
-/* [  1] */		"Синхронизация свойств и параметров"
+/* [  1] */		"Specifikator"
 }

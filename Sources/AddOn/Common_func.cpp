@@ -1,3 +1,4 @@
+//------------ kuvbur 2022 ------------
 #include "StringConversion.hpp"
 #include "ResourceIds.hpp"
 #include "DGModule.hpp"
@@ -6,7 +7,7 @@
 // -----------------------------------------------------------------------------
 // Получить массив Guid выбранных элементов
 // -----------------------------------------------------------------------------
-GS::Array<API_Guid>	GetSelectedElements(bool assertIfNoSel /* = true*/, bool onlyEditable /*= true*/)
+GS::Array<API_Guid>	GetSelectedElements()
 {
 	GSErrCode            err;
 	API_SelectionInfo    selectionInfo;
@@ -16,13 +17,9 @@ GS::Array<API_Guid>	GetSelectedElements(bool assertIfNoSel /* = true*/, bool onl
 #else
 	GS::Array<API_Neig>  selNeigs;
 #endif
-	err = ACAPI_Selection_Get(&selectionInfo, &selNeigs, onlyEditable);
+	err = ACAPI_Selection_Get(&selectionInfo, &selNeigs, false);
 	BMKillHandle((GSHandle*)&selectionInfo.marquee.coords);
-	if (err == APIERR_NOSEL || selectionInfo.typeID == API_SelEmpty) {
-		if (assertIfNoSel) {
-			DGAlert(DG_ERROR, "Error", errorString, "", "Ok");
-		}
-	}
+	if (err == APIERR_NOSEL || selectionInfo.typeID == API_SelEmpty) return GS::Array<API_Guid>();
 	if (err != NoError) {
 #ifdef AC_22
 		BMKillHandle((GSHandle*)&selNeigs);
