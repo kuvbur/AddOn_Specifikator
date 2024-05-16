@@ -19,6 +19,17 @@ void test();
 
 void Get_Qty(API_Guid elemGuid);
 
+class ElementReader
+{
+protected:
+	const API_Guid elemGuid = APINULLGuid;
+	API_Elem_Head elemHead = {};
+public:
+	ElementReader(API_Guid elemGuid);
+	virtual ~ElementReader();
+
+};
+
 #endif
 
 

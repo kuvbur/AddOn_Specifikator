@@ -182,8 +182,10 @@ def GetInstalledVisualStudioGenerator():
         raise Exception('No installed Visual Studio detected!')
     vsVersion = vsWhereOutput[0]['installationVersion'].split('.')[0]
     if vsVersion == '17':
+        print('Visual Studio 17 2022')
         return 'Visual Studio 17 2022'
     elif vsVersion == '16':
+        print('Visual Studio 16 2019')
         return 'Visual Studio 16 2019'
     else:
         raise Exception('Installed Visual Studio version not supported!')
