@@ -11,6 +11,7 @@
 #include	"APICommon26.h"
 #endif // AC_26
 #include	"ResourceIds.hpp"
+#include	"DataTypes.hpp"
 
 GS::Array<API_Guid> GetSelectedElements();
 

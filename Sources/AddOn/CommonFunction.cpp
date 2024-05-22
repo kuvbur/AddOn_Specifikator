@@ -2,7 +2,7 @@
 #include "StringConversion.hpp"
 #include "ResourceIds.hpp"
 #include "DGModule.hpp"
-#include "Common_func.hpp"
+#include "CommonFunction.hpp"
 
 // -----------------------------------------------------------------------------
 // Получить массив Guid выбранных элементов
