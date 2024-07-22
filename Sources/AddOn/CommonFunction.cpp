@@ -1,42 +1,43 @@
 //------------ kuvbur 2022 ------------
-#include "StringConversion.hpp"
-#include "ResourceIds.hpp"
-#include "DGModule.hpp"
 #include "CommonFunction.hpp"
+#include "DGModule.hpp"
+#include "ResourceIds.hpp"
+#include "StringConversion.hpp"
+
 
 // -----------------------------------------------------------------------------
 // Получить массив Guid выбранных элементов
 // -----------------------------------------------------------------------------
-GS::Array<API_Guid>	GetSelectedElements()
+GS::Array<API_Guid>	GetSelectedElements ()
 {
-	GSErrCode            err;
-	API_SelectionInfo    selectionInfo;
-	GS::UniString errorString = "Error select";
+    GSErrCode            err;
+    API_SelectionInfo    selectionInfo;
+    GS::UniString errorString = "Error select";
 #ifdef AC_22
-	API_Neig** selNeigs;
+    API_Neig** selNeigs;
 #else
-	GS::Array<API_Neig>  selNeigs;
+    GS::Array<API_Neig>  selNeigs;
 #endif
-	err = ACAPI_Selection_Get(&selectionInfo, &selNeigs, false);
-	BMKillHandle((GSHandle*)&selectionInfo.marquee.coords);
-	if (err == APIERR_NOSEL || selectionInfo.typeID == API_SelEmpty) return GS::Array<API_Guid>();
-	if (err != NoError) {
+    err = ACAPI_Selection_Get (&selectionInfo, &selNeigs, false);
+    BMKillHandle ((GSHandle*) &selectionInfo.marquee.coords);
+    if (err == APIERR_NOSEL || selectionInfo.typeID == API_SelEmpty) return GS::Array<API_Guid> ();
+    if (err != NoError) {
 #ifdef AC_22
-		BMKillHandle((GSHandle*)&selNeigs);
+        BMKillHandle ((GSHandle*) &selNeigs);
 #endif // AC_22
-		return GS::Array<API_Guid>();
-	}
-	GS::Array<API_Guid> guidArray;
+        return GS::Array<API_Guid> ();
+    }
+    GS::Array<API_Guid> guidArray;
 #ifdef AC_22
-	USize nSel = BMGetHandleSize((GSHandle)selNeigs) / sizeof(API_Neig);
-	for (USize i = 0; i < nSel; i++) {
-		guidArray.Push((*selNeigs)[i].guid);
-	}
-	BMKillHandle((GSHandle*)&selNeigs);
+    USize nSel = BMGetHandleSize ((GSHandle) selNeigs) / sizeof (API_Neig);
+    for (USize i = 0; i < nSel; i++) {
+        guidArray.Push ((*selNeigs)[i].guid);
+    }
+    BMKillHandle ((GSHandle*) &selNeigs);
 #else
-	for (const API_Neig& neig : selNeigs) {
-		guidArray.Push(neig.guid);
-	}
-	return guidArray;
+    for (const API_Neig& neig : selNeigs) {
+        guidArray.Push (neig.guid);
+    }
+    return guidArray;
 #endif // AC_22
 }
