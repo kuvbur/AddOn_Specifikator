@@ -257,6 +257,8 @@ FormatStringDict GetFotmatStringForMeasureType ();
 // -----------------------------------------------------------------------------
 FormatString ParseFormatString (const GS::UniString& stringformat);
 
+double NumRound (const double& var, const FormatString& stringformat);
+
 // -----------------------------------------------------------------------------
 // Переводит число в строку согласно настройкам строки-формата
 // -----------------------------------------------------------------------------

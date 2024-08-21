@@ -6,25 +6,30 @@
 #include    "JSONParse.hpp"
 
 
-static GSErrCode GetJSONFileLocation (DG::FileDialog::Type type, const GS::UniString& title, IO::Location& JSONFilePath)
+static GSErrCode GetJSONFileLocation (DG::FileDialog::Type type, const GS::UniString& title, GS::UniString& JSONFilePath)
 {
+    IO::Location JSONFilePath_;
     DG::FileDialog fileDialog (type);
-    IO::fileSystem.GetSpecialLocation (IO::FileSystem::CurrentFolder, &JSONFilePath);
+    IO::fileSystem.GetSpecialLocation (IO::FileSystem::CurrentFolder, &JSONFilePath_);
     fileDialog.SetTitle (title);
-    fileDialog.SetFolder (JSONFilePath);
+    fileDialog.SetFolder (JSONFilePath_);
     if (!fileDialog.Invoke ())
         return Cancel;
-    JSONFilePath = fileDialog.GetSelectedFile ();
-    return NoError;
+    JSONFilePath_ = fileDialog.GetSelectedFile ();
+    return JSONFilePath_.ToPath (&JSONFilePath);
 }
 
-static GSErrCode ParseJSON ()
+GSErrCode ParseJSON ()
 {
-    IO::Location JSONFilePath;
-    GS::UniString JSONFilePath_txt = "";
-    GSErrCode err = GetJSONFileLocation (DG::FileDialog::OpenFile, "Open JSON", JSONFilePath);
-    err = JSONFilePath.ToPath (&JSONFilePath_txt);
+    GSErrCode err = NoError;
+    GS::UniString JSONFilePath = "";
+    err = GetJSONFileLocation (DG::FileDialog::OpenFile, "Open JSON", JSONFilePath);
+    if (err != NoError) {
+        return err;
+    }
     using json = nlohmann::json;
-    std::ifstream f (JSONFilePath_txt.ToCStr ());
+    std::ifstream f (JSONFilePath.ToCStr ());
     json data = json::parse (f);
+    auto h = data["Data"];
+    return err;
 }

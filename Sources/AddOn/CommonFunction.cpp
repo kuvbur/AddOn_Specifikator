@@ -1498,6 +1498,13 @@ FormatString ParseFormatString (const GS::UniString& stringformat)
     return format;
 }
 
+double NumRound (const double& var, const FormatString& stringformat)
+{
+    double outvar = var * stringformat.koeff;
+    outvar = round (outvar * pow (10, stringformat.n_zero)) / pow (10, stringformat.n_zero);
+    if (stringformat.krat > 0) outvar = ceil_mod ((GS::Int32) var, stringformat.krat);
+    return outvar;
+}
 
 // -----------------------------------------------------------------------------
 // Переводит число в строку согласно настройкам строки-формата

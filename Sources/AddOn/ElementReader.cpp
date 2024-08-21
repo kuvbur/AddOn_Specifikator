@@ -130,7 +130,8 @@ DataStatus ElementReader::ReadDescriptors (ComponentObsoleteDict& comps)
                     CHTruncate (*listdata.descriptor.name, tname, API_DBNameLen);
                     comp.name = GS::UniString (tname);
 
-                    comp.qty = 0;
+                    comp.qty.qtyraw = 0;
+                    comp.qty.qtyrounded = 0;
                     GS::UniString key = comp.code + "@" + comp.keycode;
                     if (!comps.ContainsKey (key)) comps.Add (key, comp);
                 }
@@ -180,7 +181,7 @@ DataStatus ElementReader::ReadObsoleteComponents (ComponentObsoleteDict& comps)
                     CHTruncate (listdata.component.name, tname, API_DBNameLen);
                     comp.name = GS::UniString (tname);
 
-                    comp.qty = listdata.component.quantity;
+                    comp.qty.qtyraw = listdata.component.quantity;
                     GS::UniString key = comp.code + "@" + comp.keycode + "@" + comp.name;
                     if (!comps.ContainsKey (key)) {
                         comps.Add (key, comp);

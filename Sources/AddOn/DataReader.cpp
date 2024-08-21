@@ -7,10 +7,10 @@
 #include    "DataReader.hpp"
 #include    "DataWriter.hpp"
 #include    "ElementReader.hpp"
+#include    "JSONParse.hpp"
 
 void test ()
 {
-
     GS::Array<API_Guid> el;
     GS::Array<ReaderData::ElementReader> els;
     el = GetSelectedElements2 (false, false);

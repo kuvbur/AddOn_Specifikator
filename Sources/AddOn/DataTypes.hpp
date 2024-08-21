@@ -11,6 +11,14 @@
 
 namespace ReaderData
 {
+typedef struct
+{
+    GS::UniString unit = ""; // Единица измерения
+    FormatString stringformat; //Формат вывода
+    double qtyraw = 0; //Неокруглённое значение
+    double qtyrounded = 0; //Округлённое значение
+} QTY; // Структура для хранения данных о количестве
+
 typedef enum
 {
     DataUndefined = 0, // Данные не считаны
@@ -24,12 +32,15 @@ typedef struct
     GS::UniString code = "";
     GS::UniString keycode = "";
     GS::UniString name = "";
-    double qty = 0;
+    QTY qty;
 } ComponentObsolete; // Данные компонентов и дескрипторов
 
 // Словарь с дескрипторами и компонентами
-// Формат ключа - code + "@" + keycode + "@" + name
+// Формат ключа - code + "@" + unit + "@" + name
 typedef GS::HashTable<GS::UniString, ComponentObsolete> ComponentObsoleteDict;
+
+QTY operator+ (const QTY& lhs, const QTY& rhs);
+QTY operator+= (const QTY& lhs, const QTY& rhs);
 }
 
 namespace TableElement

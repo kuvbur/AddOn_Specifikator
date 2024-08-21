@@ -20,8 +20,8 @@
 #include    <fstream>
 #include    "DGFileDialog.hpp"
 
-static  GSErrCode GetJSONFileLocation (DG::FileDialog::Type type, const GS::UniString& title, IO::Location& JSONFilePath);
-static GSErrCode ParseJSON ();
+static GSErrCode GetJSONFileLocation (DG::FileDialog::Type type, const GS::UniString& title, IO::Location& JSONFilePath);
+GSErrCode ParseJSON ();
 
 #endif
 
