@@ -2,24 +2,22 @@
 #if !defined (DATATYPE_HPP)
 #define	DATATYPE_HPP
 
-// Заголовочный файл для общих структур
-
-#include	"ACAPinc.h"
-#include	"APICommon25.h"
-#include	"APIEnvir.h"
-#include	"ResourceIds.hpp"
-
-static const GSCharCode GChCode = CC_Cyrillic;
+// Р—Р°РіРѕР»РѕРІРѕС‡РЅС‹Р№ С„Р°Р№Р» РґР»СЏ РѕР±С‰РёС… СЃС‚СЂСѓРєС‚СѓСЂ
+#include    "ACAPinc.h"
+#include    "APICommon25.h"
+#include    "APIEnvir.h"
+#include    "DGModule.hpp"
+#include    "ResourceIds.hpp"
 
 namespace ReaderData
 {
 typedef enum
 {
-    DataUndefined = 0, // Данные не считаны
-    DataUnavailable = 1, // Данные недоступны
-    DataRead = 2, // Данные успешно считаны
-    DataNotNeed = 3, // Считывание данных не требуется
-} DataStatus; // Статус считанных данных
+    DataUndefined = 0, // Р”Р°РЅРЅС‹Рµ РЅРµ СЃС‡РёС‚Р°РЅС‹
+    DataUnavailable = 1, // Р”Р°РЅРЅС‹Рµ РЅРµРґРѕСЃС‚СѓРїРЅС‹
+    DataRead = 2, // Р”Р°РЅРЅС‹Рµ СѓСЃРїРµС€РЅРѕ СЃС‡РёС‚Р°РЅС‹
+    DataNotNeed = 3, // РЎС‡РёС‚С‹РІР°РЅРёРµ РґР°РЅРЅС‹С… РЅРµ С‚СЂРµР±СѓРµС‚СЃСЏ
+} DataStatus; // РЎС‚Р°С‚СѓСЃ СЃС‡РёС‚Р°РЅРЅС‹С… РґР°РЅРЅС‹С…
 
 typedef struct
 {
@@ -27,10 +25,10 @@ typedef struct
     GS::UniString keycode = "";
     GS::UniString name = "";
     double qty = 0;
-} ComponentObsolete; // Данные компонентов и дескрипторов
+} ComponentObsolete; // Р”Р°РЅРЅС‹Рµ РєРѕРјРїРѕРЅРµРЅС‚РѕРІ Рё РґРµСЃРєСЂРёРїС‚РѕСЂРѕРІ
 
-// Словарь с дескрипторами и компонентами
-// Формат ключа - code + "@" + keycode + "@" + name
+// РЎР»РѕРІР°СЂСЊ СЃ РґРµСЃРєСЂРёРїС‚РѕСЂР°РјРё Рё РєРѕРјРїРѕРЅРµРЅС‚Р°РјРё
+// Р¤РѕСЂРјР°С‚ РєР»СЋС‡Р° - code + "@" + keycode + "@" + name
 typedef GS::HashTable<GS::UniString, ComponentObsolete> ComponentObsoleteDict;
 }
 

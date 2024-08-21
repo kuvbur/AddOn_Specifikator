@@ -1,6 +1,7 @@
-#include "ElementReader.hpp"
+#include    "CommonFunction.hpp"
+#include    "ElementReader.hpp"
 
-// Файл для класса чтения одного элемента
+// Р¤Р°Р№Р» РґР»СЏ РєР»Р°СЃСЃР° С‡С‚РµРЅРёСЏ РѕРґРЅРѕРіРѕ СЌР»РµРјРµРЅС‚Р°
 
 namespace ReaderData
 {
@@ -23,7 +24,7 @@ ElementReader::~ElementReader ()
 void ElementReader::SetPossibleDataByType ()
 {
     API_ElemTypeID eltype = this->elemHead.typeID;
-    // Исключаемые из обработки типы
+    // РСЃРєР»СЋС‡Р°РµРјС‹Рµ РёР· РѕР±СЂР°Р±РѕС‚РєРё С‚РёРїС‹
     if (eltype == API_DimensionID ||
         eltype == API_RadialDimensionID ||
         eltype == API_LevelDimensionID ||
@@ -55,7 +56,7 @@ void ElementReader::SetPossibleDataByType ()
         this->statusDescriptors = DataNotNeed;
         return;
     }
-    // Обработка компонент, дескрипторов и параметров GDL
+    // РћР±СЂР°Р±РѕС‚РєР° РєРѕРјРїРѕРЅРµРЅС‚, РґРµСЃРєСЂРёРїС‚РѕСЂРѕРІ Рё РїР°СЂР°РјРµС‚СЂРѕРІ GDL
     if (eltype == API_ObjectID ||
        eltype == API_WindowID ||
        eltype == API_DoorID ||

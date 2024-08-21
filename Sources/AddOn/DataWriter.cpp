@@ -1,10 +1,11 @@
 //------------ kuvbur 2022 ------------
-#include	"ACAPinc.h"
-#include	"APICommon25.h"
-#include	"APIEnvir.h"
-
-#include "DataWriter.hpp"
-#include "ResourceIds.hpp"
+#include    "ACAPinc.h"
+#include    "APICommon25.h"
+#include    "APIEnvir.h"
+#include    "CommonFunction.hpp"
+#include    "DataTypes.hpp"
+#include    "DataWriter.hpp"
+#include    "ResourceIds.hpp"
 
 namespace TableElement
 {
@@ -37,11 +38,13 @@ bool GetTableDataDict (TableDataDict& tabledefinitions)
 {
     GS::Array<API_PropertyDefinition> alldefinitions;
     if (ACAPI_Property_GetPropertyDefinitions (APINULLGuid, alldefinitions) != NoError) return false;
-    for (UInt32 j = 0; j < alldefinitions.GetSize (); j++) {
-        GS::UniString alldefinitions[j].description
-            if (alldefinitions[j].description.Contains ())
-    }
+    //for (UInt32 j = 0; j < alldefinitions.GetSize (); j++) {
+    //    GS::UniString alldefinitions[j].description
+    //        if (alldefinitions[j].description.Contains ())
+    //}
+    return false;
 }
+
 void PlaceElement ()
 {
     API_Guid system, classif;
