@@ -29,15 +29,15 @@ typedef enum
 
 typedef struct
 {
-    GS::UniString code = "";
-    GS::UniString keycode = "";
-    GS::UniString name = "";
+    GS::UniString key = ""; // Имя переменной
+    GS::UniString code = ""; // Имя переменной
+    GS::UniString keycode = ""; // Тип выводимых данных
+    GS::UniString value = ""; // Значение переменной
     QTY qty;
-} ComponentObsolete; // Данные компонентов и дескрипторов
+} Values; // Данные
 
-// Словарь с дескрипторами и компонентами
-// Формат ключа - code + "@" + unit + "@" + name
-typedef GS::HashTable<GS::UniString, ComponentObsolete> ComponentObsoleteDict;
+// Формат ключа - code + "@" + keycode + "@" + unit
+typedef GS::HashTable<GS::UniString, Values> ValuesDict;
 
 QTY operator+ (const QTY& lhs, const QTY& rhs);
 QTY operator+= (const QTY& lhs, const QTY& rhs);

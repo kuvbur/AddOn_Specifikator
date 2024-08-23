@@ -79,7 +79,7 @@ bool ElementReader::GetDescriptorsStatus ()
 {
     if (this->is_Ok == false) return false;
     if (this->statusDescriptors == DataUndefined) {
-        this->statusDescriptors = this->ReadDescriptors (this->descriptors);
+        this->statusDescriptors = this->ReadDescriptors ();
     }
     return (this->statusDescriptors == DataRead);
 }
@@ -87,12 +87,12 @@ bool ElementReader::GetObsoleteComponentsStatus ()
 {
     if (this->is_Ok == false) return false;
     if (this->statusObsoleteComponents == DataUndefined) {
-        this->statusObsoleteComponents = this->ReadObsoleteComponents (this->obsoleteComponents);
+        this->statusObsoleteComponents = this->ReadObsoleteComponents ();
     }
     return (this->statusObsoleteComponents == DataRead);
 }
 
-DataStatus ElementReader::ReadDescriptors (ComponentObsoleteDict& comps)
+DataStatus ElementReader::ReadDescriptors ()
 {
     GSErrCode err = NoError;
     API_DescriptorRefType** descRefs;
@@ -114,35 +114,20 @@ DataStatus ElementReader::ReadDescriptors (ComponentObsoleteDict& comps)
                         err = ACAPI_ListData_GetLocal ((*descRefs)[i].libIndex, &this->elemHead, &listdata);
                         break;
                 }
-                if (err != NoError)
-                    break;
                 if (err == NoError) {
-                    ComponentObsolete comp;
-                    char tcode[API_DBCodeLen];
-                    CHTruncate (listdata.descriptor.code, tcode, API_DBCodeLen);
-                    comp.code = GS::UniString (tcode);
-
-                    char tkeycode[API_DBCodeLen];
-                    CHTruncate (listdata.descriptor.keycode, tkeycode, API_DBCodeLen);
-                    comp.keycode = GS::UniString (tkeycode);
-
-                    char tname[API_UAddParNumDescLen];
-                    CHTruncate (*listdata.descriptor.name, tname, API_DBNameLen);
-                    comp.name = GS::UniString (tname);
-
-                    comp.qty.qtyraw = 0;
-                    comp.qty.qtyrounded = 0;
+                    Values comp = this->GetValues (listdata.descriptor);
                     GS::UniString key = comp.code + "@" + comp.keycode;
-                    if (!comps.ContainsKey (key)) comps.Add (key, comp);
+                } else {
+                    break;
                 }
             }
         }
     }
     BMKillHandle ((GSHandle*) &descRefs);
-    return (err == NoError && !comps.IsEmpty ()) ? DataRead : DataUnavailable;
+    return (err == NoError) ? DataRead : DataUnavailable;
 }
 
-DataStatus ElementReader::ReadObsoleteComponents (ComponentObsoleteDict& comps)
+DataStatus ElementReader::ReadObsoleteComponents ()
 {
     GSErrCode err = NoError;
     API_Obsolete_ComponentRefType** compRefs;
@@ -164,34 +149,60 @@ DataStatus ElementReader::ReadObsoleteComponents (ComponentObsoleteDict& comps)
                         err = ACAPI_ListData_GetLocal ((*compRefs)[i].libIndex, &this->elemHead, &listdata);
                         break;
                 }
-                if (err != NoError)
-                    break;
                 if (err == NoError) {
-                    ComponentObsolete comp;
-
-                    char tcode[API_DBCodeLen];
-                    CHTruncate (listdata.component.code, tcode, API_DBCodeLen);
-                    comp.code = GS::UniString (tcode);
-
-                    char tkeycode[API_DBCodeLen];
-                    CHTruncate (listdata.component.keycode, tkeycode, API_DBCodeLen);
-                    comp.keycode = GS::UniString (tkeycode);
-
-                    char tname[API_DBNameLen];
-                    CHTruncate (listdata.component.name, tname, API_DBNameLen);
-                    comp.name = GS::UniString (tname);
-
-                    comp.qty.qtyraw = listdata.component.quantity;
-                    GS::UniString key = comp.code + "@" + comp.keycode + "@" + comp.name;
-                    if (!comps.ContainsKey (key)) {
-                        comps.Add (key, comp);
-                    } else {
-                        comps.Get (key).qty += comp.qty;
-                    }
+                    Values comp = this->GetValues (listdata.component);
+                    GS::UniString key = comp.code + "@" + comp.keycode;
+                } else {
+                    break;
                 }
             }
         }
     }
-    return (err == NoError && !comps.IsEmpty ()) ? DataRead : DataUnavailable;
+    return (err == NoError) ? DataRead : DataUnavailable;
 }
+
+DataStatus ElementReader::ReadGDLParameters ()
+{
+
+    API_Guid elemGuid = this->elemHead.guid;
+    API_ElemTypeID elemType = this->elemHead.typeID;
+    GetGDLParametersHead (const API_Element & element, this->elemHead, elemType, elemGuid)
+}
+
+//void 
+//GSErrCode GetGDLParameters (const API_ElemTypeID& elemType, const API_Guid& elemGuid, API_AddParType**& params)
+
+
+Values ElementReader::GetValues (API_Obsolete_ComponentType& component)
+{
+    Values comp;
+    char tcode[API_DBCodeLen];
+    CHTruncate (component.code, tcode, API_DBCodeLen);
+    comp.code = GS::UniString (tcode);
+    char tkeycode[API_DBCodeLen];
+    CHTruncate (component.keycode, tkeycode, API_DBCodeLen);
+    comp.keycode = GS::UniString (tkeycode);
+    char tname[API_DBNameLen];
+    CHTruncate (component.name, tname, API_DBNameLen);
+    comp.value = GS::UniString (tname);
+    comp.qty.qtyraw = component.quantity;
+    return comp;
+}
+Values ElementReader::GetValues (API_DescriptorType& descriptor)
+{
+    Values comp;
+    char tcode[API_DBCodeLen];
+    CHTruncate (descriptor.code, tcode, API_DBCodeLen);
+    comp.code = GS::UniString (tcode);
+    char tkeycode[API_DBCodeLen];
+    CHTruncate (descriptor.keycode, tkeycode, API_DBCodeLen);
+    comp.keycode = GS::UniString (tkeycode);
+    char tname[API_UAddParNumDescLen];
+    CHTruncate (*descriptor.name, tname, API_DBNameLen);
+    comp.value = GS::UniString (tname);
+    comp.qty.qtyraw = 0;
+    comp.qty.qtyrounded = 0;
+    return comp;
+}
+
 }

@@ -13,31 +13,33 @@ namespace ReaderData
 class ElementReader
 {
 private:
+    API_Guid elemGuid = APINULLGuid;
+    API_Elem_Head elemHead = {};
+    ValuesDict data;
     // Назначение возможных считываемых данных на основании типа
     void SetPossibleDataByType ();
     // Статус считывания компонент
     DataStatus statusObsoleteComponents = DataUndefined;
-    // Считанные компоненты
-    ComponentObsoleteDict obsoleteComponents;
     // Чтение компонент
-    DataStatus ElementReader::ReadObsoleteComponents (ComponentObsoleteDict& comps);
+    DataStatus ElementReader::ReadObsoleteComponents ();
     // Получение статуса считывания компонент
     // Если элемент не ошибочный и данные не считаны - считывает их
     bool GetObsoleteComponentsStatus ();
     // Статус считанных дескрипторов
     DataStatus statusDescriptors = DataUndefined;
     // Считанные дескрипторы
-    ComponentObsoleteDict descriptors;
-    DataStatus ElementReader::ReadDescriptors (ComponentObsoleteDict& comps);
+    DataStatus ElementReader::ReadDescriptors ();
     // Получение статуса считывания дескрипторов
     // Если элемент не ошибочный и данные не считаны - считывает их
     bool GetDescriptorsStatus ();
 
-protected:
+    DataStatus ReadGDLParameters ();
+    DataStatus statusGDLParameters = DataUndefined;
+    Values GetValues (API_Obsolete_ComponentType& component);
+    Values GetValues (API_DescriptorType& descriptor);
 
-    API_Guid elemGuid = APINULLGuid;
-    API_Elem_Head elemHead = {};
 public:
+
     virtual ~ElementReader ();
     bool Read ();
     ElementReader (API_Guid elemGuid);
