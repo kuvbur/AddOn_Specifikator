@@ -163,15 +163,10 @@ DataStatus ElementReader::ReadObsoleteComponents ()
 
 DataStatus ElementReader::ReadGDLParameters ()
 {
-
     API_Guid elemGuid = this->elemHead.guid;
     API_ElemTypeID elemType = this->elemHead.typeID;
-    GetGDLParametersHead (const API_Element & element, this->elemHead, elemType, elemGuid)
+    return DataRead;
 }
-
-//void 
-//GSErrCode GetGDLParameters (const API_ElemTypeID& elemType, const API_Guid& elemGuid, API_AddParType**& params)
-
 
 Values ElementReader::GetValues (API_Obsolete_ComponentType& component)
 {

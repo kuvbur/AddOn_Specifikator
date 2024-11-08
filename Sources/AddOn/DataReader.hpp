@@ -16,9 +16,11 @@
 #include	"ResourceIds.hpp"
 #include	"CommonFunction.hpp"
 #include    "DataTypes.hpp"
+#include    "SpecTable.hpp"
 
 void test ();
 
+bool GetSpecTable (const API_Guid& elemGuid, SpecTable::SpecTable& spec);
 
 #endif
 

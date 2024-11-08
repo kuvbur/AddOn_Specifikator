@@ -6,6 +6,7 @@
 #include    "ACAPinc.h"
 #include    "APICommon25.h"
 #include    "APIEnvir.h"
+#include    "CommonFunction.hpp"
 #include    "DGModule.hpp"
 #include    "ResourceIds.hpp"
 

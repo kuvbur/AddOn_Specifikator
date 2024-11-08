@@ -18,6 +18,15 @@
 #include <Definitions.hpp>
 #include "Point2D.hpp"
 
+#ifdef AC_22
+#define API_AttributeIndex short
+#define Vector2D Vector
+#define Point2D Coord
+#define API_BeamSegmentID API_BeamID
+#define API_ColumnSegmentID API_ColumnID
+#define API_OpeningID API_WindowID
+#endif
+
 static const Int32 MeterStringID = 17;
 static const Int32 CMeterStringID = 18;
 static const Int32 DMeterStringID = 19;
@@ -28,21 +37,31 @@ typedef std::map<std::string, API_Guid, doj::alphanum_less<std::string>> SortByN
 
 
 // Структура для хранения формата перевода чисел в строку и округления чисел
-typedef struct
-{
-    int n_zero = 2; //Количество нулей после запятой
+typedef struct {
+    int n_zero = 3; //Количество нулей после запятой
     GS::UniString stringformat = ""; // Формат строки (задаётся с помощью .mm или .0)
     bool needRound = false; //Использовать в расчётах округлённые значения
     Int32 krat = 0; // Крутность округления
     double koeff = 1; //Коэфф. увеличения
     bool trim_zero = true; //Требуется образать нули после запятой
     bool isRead = false; // Строка успешно распарсена
-    bool isEmpty = true; //Строка не задана
+    bool isEmpty = true; // Строка не задана
+    bool forceRaw = false; // Использовать неокруглённое значение для записи
     GS::UniString delimetr = ",";
 } FormatString;
 
 // Словарь с форматированием и округлением
 typedef GS::HashTable<API_PropertyMeasureType, FormatString> FormatStringDict;
+
+GS::UniString GetPropertyNameByGUID (const API_Guid& guid);
+
+void DBprnt (GS::UniString msg, GS::UniString reportString = "");
+
+void DBtest (bool usl, GS::UniString reportString, bool asserton = false);
+
+void DBtest (GS::UniString a, GS::UniString b, GS::UniString reportString, bool asserton = false);
+
+void DBtest (double a, double b, GS::UniString reportString, bool asserton = false);
 
 // -----------------------------------------------------------------------------
 // Проверка языка Архикада. Для INT возвращает 1000
@@ -52,7 +71,7 @@ Int32 isEng ();
 // -----------------------------------------------------------------------------
 // Вывод сообщения в отчёт
 // -----------------------------------------------------------------------------
-void msg_rep (const GS::UniString& modulename, const GS::UniString& reportString, const GSErrCode& err, const API_Guid& elemGuid);
+void msg_rep (const GS::UniString& modulename, const GS::UniString& reportString, const GSErrCode& err, const API_Guid& elemGuid, bool show = false);
 
 // --------------------------------------------------------------------
 // Отмечает заданный пункт активным/неактивным
@@ -234,39 +253,42 @@ GSErrCode GetRElementsForRailing (const API_Guid& elemGuid, GS::Array<API_Guid>&
 // Возвращает координаты заданной точки после трансформации матрицей
 // --------------------------------------------------------------------
 API_Coord3D GetWordCoord3DTM (const API_Coord3D vtx, const  API_Tranmat& tm);
-Point2D GetWordPoint2DTM (const Point2D vtx, const  API_Tranmat& tm);
 
+Point2D GetWordPoint2DTM (const Point2D vtx, const  API_Tranmat& tm);
 bool ClickAPoint (const char* prompt, Point2D* c);
 
-namespace FormatStringFunc
-{
-// -----------------------------------------------------------------------------
-// Обработка количества нулей и единиц измерения в имени свойства
-// Удаляет из имени paramName найденные единицы измерения
-// Возвращает строку для скармливания функции NumToStig
-// -----------------------------------------------------------------------------
-GS::UniString GetFormatString (GS::UniString& paramName);
+namespace FormatStringFunc {
+    FormatString GetFormatStringFromFormula (const GS::UniString& formula, const  GS::UniString& part, GS::UniString& stringformat);
+    // -----------------------------------------------------------------------------
+    // Обработка количества нулей и единиц измерения в имени свойства
+    // Удаляет из имени paramName найденные единицы измерения
+    // Возвращает строку для скармливания функции NumToStig
+    // -----------------------------------------------------------------------------
+    GS::UniString GetFormatString (GS::UniString& paramName);
 
-// -----------------------------------------------------------------------------
-// Возвращает словарь строк-форматов для типов данных согласно настройкам Рабочей среды проекта
-// -----------------------------------------------------------------------------
-FormatStringDict GetFotmatStringForMeasureType ();
+    // -----------------------------------------------------------------------------
+    // Возвращает словарь строк-форматов для типов данных согласно настройкам Рабочей среды проекта
+    // -----------------------------------------------------------------------------
+    FormatStringDict GetFotmatStringForMeasureType ();
 
-// -----------------------------------------------------------------------------
-// Извлекает из строки информацио о единицах измерении и округлении
-// -----------------------------------------------------------------------------
-FormatString ParseFormatString (const GS::UniString& stringformat);
+    // -----------------------------------------------------------------------------
+    // Извлекает из строки информацио о единицах измерении и округлении
+    // -----------------------------------------------------------------------------
+    FormatString ParseFormatString (const GS::UniString& stringformat);
 
-double NumRound (const double& var, const FormatString& stringformat);
+    // -----------------------------------------------------------------------------
+    // Возвращает округлённое значение согласно настройкам строки-формата
+    // -----------------------------------------------------------------------------
+    double NumRound (const double& var, const FormatString& stringformat);
 
-// -----------------------------------------------------------------------------
-// Переводит число в строку согласно настройкам строки-формата
-// -----------------------------------------------------------------------------
-GS::UniString NumToString (const double& var, const FormatString& stringformat);
+    // -----------------------------------------------------------------------------
+    // Переводит число в строку согласно настройкам строки-формата
+    // -----------------------------------------------------------------------------
+    GS::UniString NumToString (const double& var, const FormatString& stringformat);
 
-void ReplaceMeters (GS::UniString& formatstring);
+    void ReplaceMeters (GS::UniString& formatstring);
 
-void ReplaceMeters (GS::UniString& formatstring, Int32& iseng);
+    void ReplaceMeters (GS::UniString& formatstring, Int32& iseng);
 
 }
 #endif

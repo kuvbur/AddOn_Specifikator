@@ -5,11 +5,109 @@
 #include    <limits>
 #include    <math.h>
 
+GS::UniString GetPropertyNameByGUID (const API_Guid& guid)
+{
+    GS::UniString strguid = APIGuidToString (guid);
+    if (strguid.IsEqual ("2E906CCE-9A42-4E49-AE45-193D0D709CC4")) return "BuildingMaterialProperties/Building Material CutFill";
+    if (strguid.IsEqual ("FAF74D9D-3CD4-4A03-9840-A39DB757DB1C")) return "BuildingMaterialProperties/Building Material Density";
+    if (strguid.IsEqual ("68947382-7220-449A-AE47-F6F8CB47DE49")) return "BuildingMaterialProperties/Building Material Description";
+    if (strguid.IsEqual ("902756A0-71D1-402B-B639-640BA5837A95")) return "BuildingMaterialProperties/Building Material ID";
+    if (strguid.IsEqual ("A01BCC22-D1FC-4CD8-AD34-95BBE73BDD5E")) return "BuildingMaterialProperties/Building Material Manufacturer";
+    if (strguid.IsEqual ("294C063C-98D8-42B5-B2C1-C27DE7CAB756")) return "BuildingMaterialProperties/Building Material Thermal Conductivity";
+    if (strguid.IsEqual ("F99C8A52-810A-4D01-A33A-AB5FDBA43A20")) return "BuildingMaterialProperties/Building Material Heat Capacity";
+    if (strguid.IsEqual ("A01BCC22-D1FC-4CD8-AD34-95BBE73BDD5E")) return "BuildingMaterialProperties/Building Material Manufacturer";
+    if (strguid.IsEqual ("A936C5CB-5126-4135-BD87-D2A46AEF5A07")) return "BuildingMaterialProperties/Building Material Name";
+
+    return "";
+}
+
+
+void DBprnt (GS::UniString msg, GS::UniString reportString)
+{
+#if defined(TESTING)
+    if (msg.Contains ("err") || msg.Contains ("ERROR") || reportString.Contains ("err") || reportString.Contains ("ERROR")) {
+        DBPrint ("== ERROR == ");
+    }
+    DBPrint ("== SMSTF == ");
+    std::string var_str = msg.ToCStr (0, MaxUSize, GChCode).Get ();
+    DBPrint (var_str.c_str ());
+    if (!reportString.IsEmpty ()) {
+        DBPrint (" : ");
+        std::string reportString_str = reportString.ToCStr (0, MaxUSize, GChCode).Get ();
+        DBPrint (reportString_str.c_str ());
+    }
+    DBPrint ("\n");
+#else
+    UNUSED_VARIABLE (msg);
+    UNUSED_VARIABLE (reportString);
+#endif
+}
+
+void DBtest (bool usl, GS::UniString reportString, bool asserton)
+{
+#if defined(TESTING)
+    if (usl) {
+        DBprnt (reportString, "ok");
+    } else {
+        DBprnt ("=== ERROR IN TEST ===", reportString);
+    }
+    if (asserton) assert (usl);
+#else
+    UNUSED_VARIABLE (usl);
+    UNUSED_VARIABLE (asserton);
+    UNUSED_VARIABLE (reportString);
+#endif
+}
+
+void DBtest (GS::UniString a, GS::UniString b, GS::UniString reportString, bool asserton)
+{
+#if defined(TESTING)
+    GS::UniString out = a + " = " + b;
+    if (a.IsEqual (b)) {
+        reportString = "test " + reportString + " ok";
+        DBprnt (out, reportString);
+    } else {
+        out = "=== ERROR IN TEST === " + out;
+        DBprnt (out, reportString);
+    }
+    if (asserton) assert (a.IsEqual (b));
+#else
+    UNUSED_VARIABLE (a);
+    UNUSED_VARIABLE (b);
+    UNUSED_VARIABLE (asserton);
+    UNUSED_VARIABLE (reportString);
+#endif
+}
+
+void DBtest (double a, double b, GS::UniString reportString, bool asserton)
+{
+#if defined(TESTING)
+    GS::UniString out = GS::UniString::Printf ("%d = %d", a, b);
+    if (is_equal (a, b)) {
+        reportString = "test " + reportString + " ok";
+        DBprnt (out, reportString);
+    } else {
+        out = "=== ERROR IN TEST === " + out;
+        DBprnt (out, reportString);
+    }
+    if (asserton) assert (is_equal (a, b));
+#else
+    UNUSED_VARIABLE (a);
+    UNUSED_VARIABLE (b);
+    UNUSED_VARIABLE (asserton);
+    UNUSED_VARIABLE (reportString);
+#endif
+}
+
+
 // -----------------------------------------------------------------------------
 // Проверка языка Архикада. Для INT возвращает 1000
 // -----------------------------------------------------------------------------
 Int32 isEng ()
 {
+#ifdef PK_1
+    return 0;
+#endif
     GSErrCode err = NoError;
     API_ServerApplicationInfo AppInfo;
 #if defined(AC_27) || defined(AC_28)
@@ -25,7 +123,7 @@ Int32 isEng ()
 // -----------------------------------------------------------------------------
 // Вывод сообщения в отчёт
 // -----------------------------------------------------------------------------
-void msg_rep (const GS::UniString& modulename, const GS::UniString& reportString, const GSErrCode& err, const API_Guid& elemGuid)
+void msg_rep (const GS::UniString& modulename, const GS::UniString& reportString, const GSErrCode& err, const API_Guid& elemGuid, bool show)
 {
     GS::UniString error_type = "";
     if (err != NoError) {
@@ -293,12 +391,15 @@ void msg_rep (const GS::UniString& modulename, const GS::UniString& reportString
             if (ACAPI_Attribute_Get (&layer) == NoError) error_type = error_type + " layer:" + layer.header.name;
         }
     }
-    GS::UniString msg = modulename + ": " + reportString + " " + error_type + "\n";
+    GS::UniString msg = modulename + ": " + reportString;
+    if (!show) msg = msg + " " + error_type;
+    msg = "SomeStuff addon: " + msg + "\n";
     ACAPI_WriteReport (msg, false);
+    if (show) ACAPI_WriteReport (msg, show);
     if (err != NoError) {
         msg = "== SMSTF ERR ==" + msg;
     }
-    DBPrintf (msg.ToCStr ());
+    DBprnt (msg);
 }
 
 
@@ -311,7 +412,7 @@ void	MenuItemCheckAC (short itemInd, bool checked)
     GSFlags         itemFlags;
 
     BNZeroMemory (&itemRef, sizeof (API_MenuItemRef));
-    itemRef.menuResID = 32500;
+    itemRef.menuResID = ID_ADDON_MENU;
     itemRef.itemIndex = itemInd;
 
     itemFlags = 0;
@@ -372,8 +473,8 @@ GS::Array<API_Guid>	GetSelectedElements2 (bool assertIfNoSel /* = true*/, bool o
         // Получаем список связанных элементов
         guidArray.Push (neig.guid);
     }
-    return guidArray;
 #endif // AC_22
+    return guidArray;
 }
 
 // -----------------------------------------------------------------------------
@@ -489,6 +590,18 @@ GSErrCode GetPropertyFullName (const API_PropertyDefinition & definision, GS::Un
     if (definision.name.Contains ("ync_name")) {
         name = definision.name;
     } else {
+#if defined(AC_28)
+        name = GetPropertyNameByGUID (definision.guid);
+        if (!name.IsEmpty ()) {
+            if (definision.name.Contains (CharENTER)) {
+                UInt32 n = definision.name.FindFirst (CharENTER);
+                UInt32 l = definision.name.GetLength ();
+                GS::UniString attribsiffix = definision.name.GetSuffix (l - n);
+                name = name + attribsiffix;
+            }
+            return NoError;
+        }
+#endif
         API_PropertyGroup group;
         group.guid = definision.groupGuid;
         error = ACAPI_Property_GetPropertyGroup (group);
@@ -578,7 +691,11 @@ void UnhideUnlockAllLayer (void)
     UInt32 count, i;
     err = ACAPI_Attribute_GetNum (API_LayerID, count);
 #else
+#if defined(AC_22)
+    short count, i;
+#else
     API_AttributeIndex count, i;
+#endif
     err = ACAPI_Attribute_GetNum (API_LayerID, &count);
 #endif
     if (err != NoError) msg_rep ("UnhideUnlockAllLayer", "ACAPI_Attribute_GetNum", err, APINULLGuid);
@@ -634,7 +751,7 @@ bool ReserveElement (const API_Guid & objectId, GSErrCode & err)
 #else
     if (ACAPI_TeamworkControl_HasConnection () && !ACAPI_Element_Filter (objectId, APIFilt_InMyWorkspace)) {
 #endif
-#if defined(AC_24) || defined(AC_23)
+#if defined(AC_24) || defined(AC_23) || defined(AC_22)
         GS::PagedArray<API_Guid>	elements;
 #else
         GS::Array<API_Guid>	elements;
@@ -854,57 +971,43 @@ bool EvalExpression (GS::UniString & unistring_expression)
 {
     if (unistring_expression.IsEmpty ()) return false;
     if (!unistring_expression.Contains ('<')) return false;
-    GS::UniString texpression = unistring_expression;
     GS::UniString part = "";
     GS::UniString part_clean = "";
     GS::UniString stringformat = "";
+    GS::UniString rezult_txt = "";
     FormatString fstring;
-    FormatString fstring_def = FormatStringFunc::ParseFormatString (".3m");
     bool flag_change = true;
-    bool change_delim = true;
+
+    // Определение правильного разделителя для расчётов
+    GS::UniString delim = ".";
+    GS::UniString baddelim = ",";
+    GS::UniString delim_test = GS::UniString::Printf ("%.3f", 3.1456);
+    if (delim_test.Contains (baddelim)) {
+        DBprnt ("EvalExpression", "delimetr change");
+        baddelim = ".";
+        delim = ",";
+    }
     while (unistring_expression.Contains ('<') && unistring_expression.Contains ('>') && flag_change) {
         GS::UniString expression_old = unistring_expression;
-        typedef double T;
         part = unistring_expression.GetSubstring ('<', '>', 0);
-        part_clean = part;
         // Ищем строку-формат
         stringformat = "";
-        fstring = fstring_def;
-        if (unistring_expression.Contains ('.')) {
-            texpression = unistring_expression;
-            FormatStringFunc::ReplaceMeters (texpression);
-            if (texpression.Contains ('m')) {
-                UInt32 n_start = texpression.FindFirst (part) + part.GetLength (); // Индекс начала поиска строки-формата
-                GS::UniString stringformat_ = texpression.GetSubstring ('>', 'm', n_start) + 'm'; // Предположительно, строка-формат
-                if (stringformat_.Contains ('.') && !stringformat_.Contains (' ')) {
-                    // Проверим, не обрезали ли лишнюю m
-                    UInt32 n_end = n_start + stringformat_.GetLength ();
-                    if (n_end + 1 < texpression.GetLength ()) {
-                        if (texpression.GetSubstring (n_end + 1, 1) == "m") {
-                            n_end = n_end + 1;
-                        }
-                    }
-                    stringformat = unistring_expression.GetSubstring (n_start + 1, n_end - n_start);
-                    fstring = FormatStringFunc::ParseFormatString (stringformat);
-                }
-            }
-        }
-        if (part_clean.Contains (',')) {
-            part_clean.ReplaceAll (',', '.');
-            change_delim = true;
-        } else {
-            change_delim = false;
-        }
+        fstring = FormatStringFunc::GetFormatStringFromFormula (unistring_expression, part, stringformat);
+        typedef double T;
         typedef exprtk::expression<T>   expression_t;
         typedef exprtk::parser<T>       parser_t;
+        part_clean = part;
+        if (part_clean.Contains (baddelim)) part_clean.ReplaceAll (baddelim, delim);
         std::string expression_string (part_clean.ToCStr (0, MaxUSize, GChCode).Get ());
         expression_t expression;
         parser_t parser;
         parser.compile (expression_string, expression);
         const T result = expression.value ();
-        //GS::UniString rezult_txt = GS::UniString::Printf ("%.3g", result);
-        GS::UniString rezult_txt = FormatStringFunc::NumToString (result, fstring);
-        if (change_delim) rezult_txt.ReplaceAll ('.', ',');
+        rezult_txt = "";
+        if (!std::isnan (result)) rezult_txt = FormatStringFunc::NumToString (result, fstring);
+        if (std::isnan (result)) {
+            DBprnt ("err Formula is nan", part_clean);
+        }
         unistring_expression.ReplaceAll ("<" + part + ">" + stringformat, rezult_txt);
         if (expression_old.IsEqual (unistring_expression)) flag_change = false;
     }
@@ -1080,20 +1183,20 @@ GSErrCode GetGDLParameters (const API_ElemTypeID & elemType, const API_Guid & el
     BNZeroMemory (&apiParams, sizeof (API_GetParamsType));
 
     if (elemType == API_RailingToprailID
-        || elemType == API_RailingHandrailID
-        || elemType == API_RailingRailID
-        || elemType == API_RailingPostID
-        || elemType == API_RailingInnerPostID
-        || elemType == API_RailingBalusterID
-        || elemType == API_RailingPanelID
-        || elemType == API_RailingNodeID
-        || elemType == API_RailingToprailEndID
-        || elemType == API_RailingHandrailEndID
-        || elemType == API_RailingRailEndID
-        || elemType == API_RailingToprailConnectionID
-        || elemType == API_RailingHandrailConnectionID
-        || elemType == API_RailingRailConnectionID
-        || elemType == API_RailingEndFinishID) {
+       || elemType == API_RailingHandrailID
+       || elemType == API_RailingRailID
+       || elemType == API_RailingPostID
+       || elemType == API_RailingInnerPostID
+       || elemType == API_RailingBalusterID
+       || elemType == API_RailingPanelID
+       || elemType == API_RailingNodeID
+       || elemType == API_RailingToprailEndID
+       || elemType == API_RailingHandrailEndID
+       || elemType == API_RailingRailEndID
+       || elemType == API_RailingToprailConnectionID
+       || elemType == API_RailingHandrailConnectionID
+       || elemType == API_RailingRailConnectionID
+       || elemType == API_RailingEndFinishID) {
         API_ElementMemo	memo = {};
         err = ACAPI_Element_GetMemo (elemGuid, &memo, APIMemoMask_AddPars);
         params = memo.params;
@@ -1221,23 +1324,54 @@ GSErrCode GetRElementsForRailing (const API_Guid & elemGuid, GS::Array<API_Guid>
         return err;
     }
     API_ElementMemo	memo = {};
-    UInt64 mask = APIMemoMask_RailingPost | APIMemoMask_RailingInnerPost | APIMemoMask_RailingRail | APIMemoMask_RailingHandrail | APIMemoMask_RailingToprail | APIMemoMask_RailingPanel | APIMemoMask_RailingBaluster | APIMemoMask_RailingPattern | APIMemoMask_RailingBalusterSet | APIMemoMask_RailingRailEnd | APIMemoMask_RailingRailConnection;
+
+    UInt64 mask = APIMemoMask_RailingNode | APIMemoMask_RailingSegment | APIMemoMask_RailingPost | APIMemoMask_RailingInnerPost | APIMemoMask_RailingRail | APIMemoMask_RailingHandrail | APIMemoMask_RailingToprail | APIMemoMask_RailingPanel | APIMemoMask_RailingBaluster | APIMemoMask_RailingPattern | APIMemoMask_RailingBalusterSet | APIMemoMask_RailingRailEnd | APIMemoMask_RailingHandrailEnd | APIMemoMask_RailingToprailEnd | APIMemoMask_RailingRailConnection | APIMemoMask_RailingHandrailConnection | APIMemoMask_RailingToprailConnection;
     err = ACAPI_Element_GetMemo (elemGuid, &memo, mask);
     if (err != NoError) {
         ACAPI_DisposeElemMemoHdls (&memo);
         return err;
     }
     GSSize n = 0;
-    n = BMGetPtrSize (reinterpret_cast<GSPtr>(memo.railingPosts)) / sizeof (API_RailingPostType);
+    n = BMGetPtrSize (reinterpret_cast<GSPtr>(memo.railingRailConnections)) / sizeof (API_RailingRailConnectionType);
     if (n > 0) {
         for (Int32 idx = 0; idx < n; ++idx) {
-            elementsGuids.Push (std::move (memo.railingPosts[idx].head.guid));
+            elementsGuids.Push (std::move (memo.railingRailConnections[idx].head.guid));
+        }
+    }
+    n = BMGetPtrSize (reinterpret_cast<GSPtr>(memo.railingHandrailConnections)) / sizeof (API_RailingRailConnectionType);
+    if (n > 0) {
+        for (Int32 idx = 0; idx < n; ++idx) {
+            elementsGuids.Push (std::move (memo.railingHandrailConnections[idx].head.guid));
+        }
+    }
+    n = BMGetPtrSize (reinterpret_cast<GSPtr>(memo.railingToprailConnections)) / sizeof (API_RailingRailConnectionType);
+    if (n > 0) {
+        for (Int32 idx = 0; idx < n; ++idx) {
+            elementsGuids.Push (std::move (memo.railingToprailConnections[idx].head.guid));
         }
     }
     n = BMGetPtrSize (reinterpret_cast<GSPtr>(memo.railingRailEnds)) / sizeof (API_RailingRailEndType);
     if (n > 0) {
         for (Int32 idx = 0; idx < n; ++idx) {
             elementsGuids.Push (std::move (memo.railingRailEnds[idx].head.guid));
+        }
+    }
+    n = BMGetPtrSize (reinterpret_cast<GSPtr>(memo.railingHandrailEnds)) / sizeof (API_RailingRailEndType);
+    if (n > 0) {
+        for (Int32 idx = 0; idx < n; ++idx) {
+            elementsGuids.Push (std::move (memo.railingHandrailEnds[idx].head.guid));
+        }
+    }
+    n = BMGetPtrSize (reinterpret_cast<GSPtr>(memo.railingToprailEnds)) / sizeof (API_RailingRailEndType);
+    if (n > 0) {
+        for (Int32 idx = 0; idx < n; ++idx) {
+            elementsGuids.Push (std::move (memo.railingToprailEnds[idx].head.guid));
+        }
+    }
+    n = BMGetPtrSize (reinterpret_cast<GSPtr>(memo.railingPosts)) / sizeof (API_RailingPostType);
+    if (n > 0) {
+        for (Int32 idx = 0; idx < n; ++idx) {
+            elementsGuids.Push (std::move (memo.railingPosts[idx].head.guid));
         }
     }
     n = BMGetPtrSize (reinterpret_cast<GSPtr>(memo.railingRails)) / sizeof (API_RailingRailType);
@@ -1292,6 +1426,7 @@ API_Coord3D GetWordCoord3DTM (const API_Coord3D vtx, const API_Tranmat & tm)
     return trCoord;
 }
 
+
 Point2D GetWordPoint2DTM (const Point2D vtx, const API_Tranmat & tm)
 {
     API_Coord3D c = GetWordCoord3DTM ({ vtx.x, vtx.y, 0 }, tm);
@@ -1324,6 +1459,50 @@ bool	ClickAPoint (const char* prompt, Point2D * c)
 
 namespace FormatStringFunc
 {
+FormatString GetFormatStringFromFormula (const GS::UniString& formula, const  GS::UniString& part, GS::UniString& stringformat)
+{
+    FormatString f = ParseFormatString (".3m");
+    if (!formula.Contains ('.')) return f;
+    GS::UniString texpression = formula;
+    GS::UniString texpression_ = formula;
+    FormatStringFunc::ReplaceMeters (texpression);
+    if (!texpression.Contains ('m')) return f;
+    GS::UniString tpart = part;
+    texpression.ReplaceAll ("{", "");
+    texpression.ReplaceAll ("}", "");
+    texpression_.ReplaceAll ("{", "");
+    texpression_.ReplaceAll ("}", "");
+    tpart.ReplaceAll ("{", "");
+    tpart.ReplaceAll ("}", "");
+    UInt32 n_start = texpression.FindFirst (tpart) + tpart.GetLength (); // Индекс начала поиска строки-формата
+    GS::UniString stringformat_ = texpression.GetSubstring ('>', 'm', n_start) + 'm'; // Предположительно, строка-формат
+    if (stringformat_.IsEmpty ()) stringformat_ = texpression.GetSubstring ('"', 'm', n_start) + 'm';
+    if (stringformat_.Contains ('.') && !stringformat_.Contains (' ')) {
+        // Проверим, не обрезали ли лишнюю m
+        n_start = texpression.FindFirst (stringformat_) - 1;
+        UInt32 n_end = n_start + stringformat_.GetLength ();
+        if (n_end + 1 < texpression.GetLength ()) {
+            GS::UniString endm = texpression.ToLowerCase ().GetSubstring (n_end + 1, 1);
+            if (endm.IsEqual ("m") || endm.IsEqual ("p") || endm.IsEqual ("r") || endm.IsEqual ("f")) {
+                n_end = n_end + 1;
+            }
+        }
+        stringformat = texpression_.GetSubstring (n_start + 1, n_end - n_start);
+#ifdef TESTING
+        DBtest (!stringformat.Contains ('"'), "GetFormatStringFromFormula : stringformat.Contains('\"') " + stringformat, false);
+        DBtest (!stringformat.Contains ('>'), "GetFormatStringFromFormula : stringformat.Contains('>') " + stringformat, false);
+        DBtest (!stringformat.Contains ('%'), "GetFormatStringFromFormula : stringformat.Contains('%') " + stringformat, false);
+        DBtest (!stringformat.Contains ('}'), "GetFormatStringFromFormula : stringformat.Contains('}') " + stringformat, false);
+#endif
+        stringformat.Trim ('"');
+        stringformat.Trim ('>');
+        stringformat.Trim ('%');
+        stringformat.Trim ('}');
+        stringformat.Trim ();
+        f = FormatStringFunc::ParseFormatString (stringformat);
+    }
+    return f;
+}
 
 // -----------------------------------------------------------------------------
 // Обработка количества нулей и единиц измерения в имени свойства
@@ -1348,6 +1527,9 @@ GS::UniString GetFormatString (GS::UniString& paramName)
             }
             paramName.ReplaceAll ('.' + formatstring, "");
             ReplaceMeters (formatstring, iseng);
+        } else {
+            // Если .м найдена не в последнем блоке - то это не строка-формат
+            formatstring = "";
         }
     }
     return formatstring;
@@ -1422,6 +1604,7 @@ FormatString ParseFormatString (const GS::UniString& stringformat)
     double koeff = 1; //Коэфф. увеличения
     bool trim_zero = true; //Требуется образать нули после запятой
     bool needround = false; //Требуется округлить численное значение для вычислений
+    bool forceRaw = false; // Использовать неокруглённое значение для записи
     GS::UniString delimetr = ","; // Разделитель дробной части
     FormatString format;
     format.stringformat = stringformat;
@@ -1457,6 +1640,7 @@ FormatString ParseFormatString (const GS::UniString& stringformat)
             outstringformat.ReplaceAll ("km", "");
         }
         if (outstringformat.Contains ("m")) {
+            koeff = 1;
             n_zero = 3;
             outstringformat.ReplaceAll ("m", "");
         }
@@ -1468,7 +1652,10 @@ FormatString ParseFormatString (const GS::UniString& stringformat)
             needround = true;
             outstringformat.ReplaceAll ("r", "");
         }
-
+        if (outstringformat.Contains ("f")) {
+            forceRaw = true;
+            outstringformat.ReplaceAll ("f", "");
+        }
         // Принудительный вывод заданного кол-ва нулей после запятой
         if (outstringformat.Contains ("0")) {
             outstringformat.ReplaceAll ("0", "");
@@ -1476,19 +1663,12 @@ FormatString ParseFormatString (const GS::UniString& stringformat)
             if (!outstringformat.IsEmpty ()) trim_zero = false;
         }
         if (!outstringformat.IsEmpty ()) {
-            // Кратность округления
-            if (outstringformat.Contains ("/")) {
-                GS::Array<GS::UniString> params;
-                UInt32 nparam = StringSplt (outstringformat, "/", params);
-                if (params.GetSize () > 0) n_zero = std::atoi (params[0].ToCStr ());
-                if (params.GetSize () > 1) krat = std::atoi (params[0].ToCStr ());
-            } else {
-                n_zero = std::atoi (outstringformat.ToCStr ());
-            }
+            n_zero = std::atoi (outstringformat.ToCStr ());
         }
         format.isEmpty = false;
         format.isRead = true;
     }
+    format.forceRaw = forceRaw;
     format.needRound = needround;
     format.delimetr = delimetr;
     format.n_zero = n_zero;
@@ -1498,6 +1678,9 @@ FormatString ParseFormatString (const GS::UniString& stringformat)
     return format;
 }
 
+// -----------------------------------------------------------------------------
+// Возвращает округлённое значение согласно настройкам строки-формата
+// -----------------------------------------------------------------------------
 double NumRound (const double& var, const FormatString& stringformat)
 {
     double outvar = var * stringformat.koeff;
