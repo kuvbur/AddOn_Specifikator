@@ -28,6 +28,11 @@ public:
     GS::Array<GS::UniString> filter_subposname_add;
     GS::Array<GS::UniString> filter_subposname_ignore;
 };
+
+// ѕолучение версии таблицы. ≈сли переменна€ с версией не найдена - возвращает 0
+Int32 GetSpecTableVersion (API_AddParType**& addPars);
+bool GetSpecTable (API_AddParType**& addPars, SpecTable& spec);
+
 }
 #endif
 

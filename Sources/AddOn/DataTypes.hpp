@@ -10,8 +10,6 @@
 #include    "DGModule.hpp"
 #include    "ResourceIds.hpp"
 
-namespace ReaderData
-{
 typedef struct
 {
     GS::UniString unit = ""; // Единица измерения
@@ -19,6 +17,9 @@ typedef struct
     double qtyraw = 0; //Неокруглённое значение
     double qtyrounded = 0; //Округлённое значение
 } QTY; // Структура для хранения данных о количестве
+
+namespace ReaderData
+{
 
 typedef enum
 {
@@ -53,6 +54,20 @@ typedef struct
     short inx = 0;
 } TableData;
 typedef GS::HashTable<short, TableData> TableDataDict;
+}
+
+
+namespace CompTypes
+{
+typedef enum
+{
+    TypeUndef = 0,
+    TypeArm = 10,
+    TypeProkat = 20,
+    TypeMat = 30,
+    TypeIzd = 40,
+    TypeSubpos = 45,
+} Comp_Type;
 }
 
 #endif

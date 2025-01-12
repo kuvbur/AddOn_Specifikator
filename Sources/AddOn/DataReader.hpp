@@ -20,7 +20,6 @@
 
 void test ();
 
-bool GetSpecTable (const API_Guid& elemGuid, SpecTable::SpecTable& spec);
 
 #endif
 
